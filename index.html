@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<h1>Evade: Level <span class=lvl>0</span></h1>
+<svg id=board width=750 height=400>
+   <rect id=mage x=10 y=200 height=35 width=35 stroke=blue stroke-width=3 fill=black></rect>
+  </svg>
+<script>
+    var mage = document.getElementById('mage');
+    var board = document.getElementById('board');
+    var keysPressed = {};
+    var level = 0;
+    var width = 750;
+    var height = 400;
+    var start = {x: 10, y: 200 };
+    var er = 17.5
+    document.addEventListener('keydown', function (event) {
+        keysPressed[event.keyCode] = true;
+    })
+    document.addEventListener('keyup', function (event) {
+        keysPressed[event.keyCode] = false;
+    })
+    var enemies = createScreen();
+    enemies.forEach(function (enemy) {
+      var circ = document.createElementNS("http://www.w3.org/2000/svg",'circle')
+      circ.setAttributeNS(null, 'fill', 'white');
+      circ.setAttributeNS(null, 'stroke', 'red');
+      circ.setAttributeNS(null, 'r', er);
+      circ.setAttributeNS(null, 'stroke-width', 3);
+      circ.setAttributeNS(null, 'class', 'enemy');
+      circ.setAttributeNS(null, 'cx', enemy.cx);
+      circ.setAttributeNS(null, 'cy', enemy.cy);
+      board.appendChild(circ)
+    })
+    function gameLoop (){
+        if (keysPressed[70] || keysPressed[40]) {
+            mage.setAttribute('y', +mage.getAttribute('y') + 1);
+        }
+        if (keysPressed[74] || keysPressed[38]){
+            mage.setAttribute('y', +mage.getAttribute('y') - 1);
+        }
+        mage.setAttribute('x', +mage.getAttribute('x') + 1);
+        // console.log(keysPressed);
+        enemies.forEach(colide);
+        // above board
+        if (mage.getAttribute('y') < -er) {
+            mage.setAttribute('y', height);
+        }
+        // below board
+        if (mage.getAttribute('y') > height) {
+            mage.setAttribute('y', -er)
+        }
+
+        // Next level!
+        if (mage.getAttribute('x') >= width) {
+            mage.setAttribute('x', start.x);
+            mage.setAttribute('y', start.y);
+            level = level + 1;
+            for (var el of document.getElementsByClassName('lvl')) {
+                el.innerHTML = level
+            }
+            enemies = createScreen();
+            let idx = 0;
+            for (var enemy of document.getElementsByClassName('enemy')) {
+                var position = enemies[idx++];
+                enemy.setAttributeNS(null, 'cx', position.cx)
+                enemy.setAttributeNS(null, 'cy', position.cy)
+            }
+            console.log({ level })
+        }
+        requestAnimationFrame(gameLoop);
+    }
+    gameLoop();
+    function randomEnemy () {
+        var cx = 100 + Math.floor(650 * Math.random());
+        var cy = Math.floor(400 * Math.random())
+        return {
+            cx,
+            cy
+        }
+    }
+    function createScreen () {
+        var enemies = [];
+        for (var x = 0; x < 30; x = x + 1) {
+            enemies.push(randomEnemy())
+        }
+        return enemies
+    }
+    function colide (enemy) {
+        var half = 35 / 2;
+        var my = +mage.getAttribute('y') + half;
+        var mx = +mage.getAttribute('x') + half;
+        var edistance = er / Math.SQRT2;
+        if (mx + half >= enemy.cx - edistance 
+          && mx - half <= enemy.cx + edistance
+          && my - half <= enemy.cy + edistance
+          && my + half >= enemy.cy - edistance) {
+           location.reload();
+        }
+    }
+</script>
