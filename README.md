@@ -1,4 +1,6 @@
 # evade
 You are the square, get through the levels.
 
-Designed by and pair programmed with Felix Niemeir
+https://nrn.github.io/evade/
+
+Designed by and pair programmed with Felix Niemeir.
