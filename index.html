@@ -12,6 +12,7 @@
     var height = 400;
     var start = {x: 10, y: 200 };
     var er = 17.5
+
     document.addEventListener('keydown', function (event) {
         keysPressed[event.keyCode] = true;
     })
@@ -30,6 +31,11 @@
       circ.setAttributeNS(null, 'cy', enemy.cy);
       board.appendChild(circ)
     })
+    function reset () {
+        level = 0;
+        enemies = createScreen()
+        setLevel(0, enemies);
+    }
     function gameLoop (){
         if (keysPressed[70] || keysPressed[40]) {
             mage.setAttribute('y', +mage.getAttribute('y') + 1);
@@ -51,24 +57,29 @@
 
         // Next level!
         if (mage.getAttribute('x') >= width) {
-            mage.setAttribute('x', start.x);
-            mage.setAttribute('y', start.y);
             level = level + 1;
-            for (var el of document.getElementsByClassName('lvl')) {
-                el.innerHTML = level
-            }
             enemies = createScreen();
-            let idx = 0;
-            for (var enemy of document.getElementsByClassName('enemy')) {
-                var position = enemies[idx++];
-                enemy.setAttributeNS(null, 'cx', position.cx)
-                enemy.setAttributeNS(null, 'cy', position.cy)
-            }
-            console.log({ level })
+            setLevel(level, enemies);
+
         }
         requestAnimationFrame(gameLoop);
     }
     gameLoop();
+    function setLevel (level, enemies) {
+        mage.setAttribute('x', start.x);
+        mage.setAttribute('y', start.y);
+
+        for (var el of document.getElementsByClassName('lvl')) {
+          el.innerHTML = level
+        }
+
+        let idx = 0;
+        for (var enemy of document.getElementsByClassName('enemy')) {
+            var position = enemies[idx++];
+            enemy.setAttributeNS(null, 'cx', position.cx)
+            enemy.setAttributeNS(null, 'cy', position.cy)
+        }
+    }
     function randomEnemy () {
         var cx = 100 + Math.floor(650 * Math.random());
         var cy = Math.floor(400 * Math.random())
@@ -93,7 +104,7 @@
           && mx - half <= enemy.cx + edistance
           && my - half <= enemy.cy + edistance
           && my + half >= enemy.cy - edistance) {
-           location.reload();
+           reset();
         }
     }
 </script>
